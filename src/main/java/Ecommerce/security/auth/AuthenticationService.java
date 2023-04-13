@@ -5,7 +5,6 @@ import Ecommerce.security.user.Role;
 import Ecommerce.security.user.User;
 import Ecommerce.security.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,10 +24,10 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequest registerRequest) {
         User user = User.builder()
-                .firstName(registerRequest.getFirstName())
-                .lastName(registerRequest.getLastName())
-                .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .firstName(registerRequest.firstName())
+                .lastName(registerRequest.lastName())
+                .email(registerRequest.email())
+                .password(passwordEncoder.encode(registerRequest.password()))
                 .role(Role.USER)
                 .build();
         userRepository.save(user);
@@ -41,11 +40,11 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authenticationRequest.getEmail(),
-                        authenticationRequest.getPassword()
+                        authenticationRequest.email(),
+                        authenticationRequest.password()
                 )
         );
-        User user = userRepository.findByEmail(authenticationRequest.getEmail())
+        User user = userRepository.findByEmail(authenticationRequest.email())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         String token = jwtService.generateToken(new HashMap<>(), user);
         return AuthenticationResponse.builder()
